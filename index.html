@@ -50,24 +50,26 @@
         .egroup {
             width: auto;
             height: 18px;
-            margin: 2px 0;
+
             /* background-color: green; */
             display: flex;
             justify-content: center;
             align-items: center;
-            color: #46d16a;
+            color: #ff4800;
             padding: 0;
             font-size: 20px;
             font-family: sans-serif;
             font-weight: bold;
+            margin: 2px 0;
         }
         .etext {
-            color: #4fab4f;
+            color: #ff4800;
             padding: 0;
             font-size: 20px;
             font-family: sans-serif;
             font-weight: bold;
         }
+
         .ogroup {
             width: auto;
             height: 18px;
@@ -76,40 +78,39 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            color: #f55959;
+            color: #13b966;
             padding: 0;
             font-size: 20px;
             font-family: sans-serif;
             font-weight: bold;
         }
         .otext {
-            color: #f34a4a;
+            color: #13b966;
             padding: 0;
             font-size: 20px;
             font-family: sans-serif;
             font-weight: bold;
         }
-        
     </style>
 
 </head>
 
 <body>
     <!-- <div class="mainContainer">
-                                                                                                            <div class="linea"></div>
-                                                                                                           
-                                                                                                        </div> -->
+                                                                                                    <div class="linea"></div>
+                                                                                                   
+                                                                                                </div> -->
     <div id="container"></div>
 
     <!-- structura interna -->
     <!-- 
-                                                                                <div class="egroup">
-                                                                                    <span class="etext">2e</span>
-                                                                                </div>
-                                                                                <div class="ogroup">
-                                                                                    <span class="otext">3o</span>
-                                                                                </div>
-                                                                              -->
+                                                                        <div class="egroup">
+                                                                            <span class="etext">2e</span>
+                                                                        </div>
+                                                                        <div class="ogroup">
+                                                                            <span class="otext">3o</span>
+                                                                        </div>
+                                                                      -->
 
     <script>
 
@@ -138,131 +139,122 @@
 
         var addOGroup = false;
         var addEGroup = false;
- 
-        var oneConter = 0;
-        var oneAdded = false;
+
+        var ctr = 0;
+        var ctg = false;
 
         ws.onmessage = function (msg) {
             var data = JSON.parse(msg.data);
-
             var digit = Number(data.tick.quote).toFixed(decimals).slice(-1);
 
-
             if (digit % 2 === 0) {
-                var text = "O";
-                if (oCounter > 0) { // AñadirGruposE(digit, 1);
+                if (oCounter > 0) {
                     glist.push(1);
-
                     addEGroup = true
-
                 }
                 oCounter = 0;
                 eCounter += 1;
 
             } else {
-                var text = "E";
-                if (eCounter > 0) { // AñadirGruposO(digit, 1);
+                if (eCounter > 0) {
                     glist.push(1);
                     addOGroup = true;
-
                 }
                 eCounter = 0;
                 oCounter += 1;
             }
             if (eCounter > 0) {
-                // var text = "E";
-                // arr2[0] = eCounter + text;
+
                 if (addEGroup) {
                     addEGroup = false;
-                } else { // AñadirDigitsE(digit, eCounter);
+                } else {
                     glist[glist.length - 1] = eCounter;
-
-
                 }
-
-                // console.log("Ecounter mayor a cero");
             }
             if (oCounter > 0) {
-                // var text = "O";
-                // arr2[0] = oCounter + text;
+
                 if (addOGroup) {
                     addOGroup = false;
-                } else { // AñadirDigitsO(digit, oCounter);
+                } else {
                     glist[glist.length - 1] = oCounter;
-
-
-                    // console.log("Ocounter mayor a cero");
                 }
-                // mostrar en lista este array
-                // listC = arr1 + "," + arr2;
-                // console.log("Groups: " + listC);
-                // var digitListView = document.getElementById("digitGroups");
+
             }
             var d3 = glist[glist.length - 3];
             var d2 = glist[glist.length - 2];
             var d1 = glist[glist.length - 1];
-            console.log(glist);
-            // falta hacerlo realtime
-            // var state = false;
+          //  console.log(glist);
+ 
+            if (glist.length >= 2) {
 
-            if (glist.length >= 1) {
+                if (d1 == 1) {  
+                    ctr++ 
+                    if (ctr >= 1 && ctg == false) {  
+                        selectList.push(ctr);
+                        addgroup(ctr); 
+
+                        ctg = true 
+
+                    }
+                    if (ctg == true) { 
+                        selectList[selectList.length - 1] = ctr;
+                        // ctg = true
+                        updateGroup(ctr);
+                    }
+
+                } else if (d1 > 1) { // esto es un grupo
+
+                    if (selectList[selectList.length - 1] != "Gs") {
+
+                        selectList.splice(-1, 1);
+                        del();
+                    }
+
+                    ctr--
+                    if (ctr < 1) {} else {
 
 
-                if (d1 == 1) {
-                    oneConter++
-                    oneAdded = false;
-                    //test
-                   // selectList[selectList.length-1] =  oneConter;
+                        selectList.push(ctr);
+                        selectList.push("Gs");
+                        addgroup(ctr);
+                        addgroup(0);
+                    } ctg = false
+                    ctr = 0;
                 }
-                if (d1 == 2) {
-                    oneConter-- 
-                    oneAdded =true;
-
-                    if(oneConter ==0){
-                        // selectList.push("G");
-                         oneConter =0;
-                    }else{
-
-                         selectList.push(oneConter);
-                         selectList.push("G");
-                         addgroup(oneConter);
-                         addgroup("G");
-                          oneConter =0;
-                    }   
-                   
-                }
-                if (d1 > 2) {
-                 
-                      if (oneAdded == true) {
-                    selectList[selectList.length-1] = "G";
-                   // updateGroup("G");
-                    oneConter =0;
-                      }
-                    
-                }
-
+ 
             }
 
-            
+            // console.log("ctg:" + ctg);
+            // console.log("ctr:" + ctr);
+            // console.log("%c lista de ejemplo:" + selectList, "color:#3399ff;");
 
 
-            
+            // /////////
+
 
             function addgroup(value) {
                 var edigitText = document.createTextNode(value);
-                var Group = document.createElement("div");
-                var Etext = document.createElement("span");
-                if (typeof value === 'string') {
+                var container = document.getElementById("container");
+
+                if (value >= 1) {
+                    var Group = document.createElement("div");
+                    var Etext = document.createElement("span");
                     Group.setAttribute('class', 'egroup');
                     Etext.setAttribute("class", "etext");
-                } else {
-                    Group.setAttribute('class', 'egroup');
-                    Etext.setAttribute("class", "otext");
+                    Etext.appendChild(edigitText);
+                    Group.appendChild(Etext);
+                    container.appendChild(Group);
+                } else if (value < 1) {
+
+                    var Group = document.createElement("div");
+                    var otext = document.createElement("span");
+                    Group.setAttribute('class', 'ogroup');
+                    otext.setAttribute("class", "otext");
+                    otext.appendChild(document.createTextNode("Gs"));
+                    Group.appendChild(otext);
+                    container.appendChild(Group);
                 }
-                 Etext.appendChild(edigitText);
-                Group.appendChild(Etext);
-                var container = document.getElementById("container");
-                container.appendChild(Group);
+
 
             }
             function updateGroup(value) {
@@ -271,8 +263,13 @@
 
             }
 
+            function del() {
+                var counterItem = document.getElementsByClassName("egroup");
+                counterItem[counterItem.length - 1].remove();
+            }
 
-            console.log("select List:" + selectList);
+
+            // console.log("select List:" + selectList);
 
 
         }
